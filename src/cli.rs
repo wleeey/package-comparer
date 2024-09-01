@@ -1,12 +1,8 @@
 use inquire::Select;
-use package_comparer::Arch;
+use package_comparer::architecture_support::Arch;
 
-pub fn select_architecture(architectures: Vec<Arch>) -> SelectedArch {
-    let selected_arch = Select::new("Architecture that interests you:", architectures)
+pub fn select_architecture(architectures: Vec<Arch>) -> Arch {
+    Select::new("Architecture that interests you:", architectures)
         .prompt()
-        .expect("It is necessary to choose an architecture");
-
-    SelectedArch(selected_arch)
+        .expect("It is necessary to choose an architecture")
 }
-
-pub struct SelectedArch(Arch);
