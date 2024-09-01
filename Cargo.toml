@@ -1,0 +1,20 @@
+[package]
+name = "package-comparer"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "package-comparer"
+
+[dependencies]
+env_logger = "0.11.5"
+inquire = "0.7.5"
+log = "0.4.22"
+reqwest = { version = "0.12.7", features = ["json", "multipart"] }
+rpm = "0.15.1"
+serde = { version = "1.0.209", features = ["derive"] }
+tokio = { version = "1.39.3", features = ["rt", "rt-multi-thread", "macros"] }
