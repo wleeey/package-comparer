@@ -47,5 +47,5 @@ async fn main() {
 }
 
 fn fetch_error_for_output(fetch_fn: FetchError) -> Vec<Package> {
-    cases::handle_fetch_error(fetch_fn, vec![])
+    package_comparer::handle_fetch_error(fetch_fn, vec![])
 }

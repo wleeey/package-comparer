@@ -16,19 +16,7 @@ pub async fn fetch_only_packages_from_selected_branch(
         .await
     {
         Ok(packages) => Ok(only_a_packages(primary_packages, packages)),
-        Err(err) => Ok(handle_fetch_error(err, primary_packages)),
-    }
-}
-
-pub fn handle_fetch_error(fetch_error: FetchError, packages: Vec<Package>) -> Vec<Package> {
-    match fetch_error {
-        FetchError::ArchNotSupported { branch, arch } => {
-            log::info!("Architectures {arch} is not supported for {branch} branch");
-            packages
-        }
-        FetchError::Other(message) => {
-            panic!("{}", message)
-        }
+        Err(err) => Ok(crate::handle_fetch_error(err, primary_packages)),
     }
 }
 

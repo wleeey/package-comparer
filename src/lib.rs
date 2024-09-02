@@ -38,3 +38,15 @@ pub enum FetchError {
     ArchNotSupported { branch: String, arch: String },
     Other(String),
 }
+
+pub fn handle_fetch_error(fetch_error: FetchError, packages: Vec<Package>) -> Vec<Package> {
+    match fetch_error {
+        FetchError::ArchNotSupported { branch, arch } => {
+            log::info!("Architectures {arch} is not supported for {branch} branch");
+            packages
+        }
+        FetchError::Other(message) => {
+            panic!("{}", message)
+        }
+    }
+}
