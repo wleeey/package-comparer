@@ -48,7 +48,7 @@ async fn fetch_packages(branch: Branch) -> Vec<Package> {
         .packages
 }
 
-fn extract_architectures_from_packages(packages: &Vec<Package>) -> Vec<&str> {
+fn extract_architectures_from_packages(packages: &[Package]) -> Vec<&str> {
     packages
         .iter()
         .map(|package| package.arch_ref())

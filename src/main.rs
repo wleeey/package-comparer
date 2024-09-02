@@ -23,19 +23,19 @@ async fn main() {
     let only_sisyphus_packages =
         cases::fetch_only_packages_from_selected_branch(Branch::Sisyphus, &selected_arch)
             .await
-            .unwrap_or_else(|err| fetch_error_for_output(err));
+            .unwrap_or_else(fetch_error_for_output);
 
     log::info!("Fetching those packages that are only in p10 but not in sisyphus...");
     let only_p10_packages =
         cases::fetch_only_packages_from_selected_branch(Branch::P10, &selected_arch)
             .await
-            .unwrap_or_else(|err| fetch_error_for_output(err));
+            .unwrap_or_else(fetch_error_for_output);
 
     log::info!("Fetching those packages that have more version-release in sisyphus than in p10...");
     let packages_vr_more_in_sisyphus_than_p10 =
         cases::fetch_vr_more_in_sisyphus_than_p10(&selected_arch)
             .await
-            .unwrap_or_else(|err| fetch_error_for_output(err));
+            .unwrap_or_else(fetch_error_for_output);
 
     let output = serde_json::json!({
         "only_sisyphus_packages": only_sisyphus_packages,

@@ -53,23 +53,23 @@ pub async fn fetch_vr_more_in_sisyphus_than_p10(arch: &Arch) -> Result<Vec<Packa
     Ok(sisyphus_packages
         .into_iter()
         .filter(|sisyphus_package| {
-            p10_names.contains(&sisyphus_package.name_ref().to_string())
+            p10_names.contains(sisyphus_package.name_ref())
                 && p10_packages.iter().any(|p10_package| {
                     p10_package.name_ref() == sisyphus_package.name_ref()
                         && rpm::rpm_evr_compare(
                             &Nevra::new(
                                 "",
-                                &sisyphus_package.epoch_ref().to_string().as_str(),
-                                &sisyphus_package.version_ref(),
-                                &sisyphus_package.release_ref(),
+                                sisyphus_package.epoch_ref().to_string().as_str(),
+                                sisyphus_package.version_ref(),
+                                sisyphus_package.release_ref(),
                                 "",
                             )
                             .to_string(),
                             &Nevra::new(
                                 "",
-                                &p10_package.epoch_ref().to_string().as_str(),
-                                &p10_package.version_ref(),
-                                &p10_package.release_ref(),
+                                p10_package.epoch_ref().to_string().as_str(),
+                                p10_package.version_ref(),
+                                p10_package.release_ref(),
                                 "",
                             )
                             .to_string(),
