@@ -51,7 +51,7 @@ async fn fetch_packages(branch: Branch) -> Vec<Package> {
 fn extract_architectures_from_packages(packages: &Vec<Package>) -> Vec<&str> {
     packages
         .iter()
-        .map(|package| package.arch_ref())
+        .map(|package| package.arch_as_str())
         .collect::<HashSet<_>>()
         .into_iter()
         .collect()

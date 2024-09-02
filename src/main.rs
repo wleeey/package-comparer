@@ -1,6 +1,7 @@
 use env_logger::Builder;
 use log::LevelFilter;
 use package_comparer::branches::Branch;
+use package_comparer::cases::fetch_vr_more_in_sisyphus_than_p10;
 use package_comparer::{architecture_support, cases};
 use std::io::Write;
 
@@ -22,7 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("sisyphus");
     for only_sisyphus_package in only_sisyphus_packages {
-        println!("{}", only_sisyphus_package.name_ref())
+        println!("{}", only_sisyphus_package.name_as_str())
     }
 
     println!("p10");
@@ -30,7 +31,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         cases::fetch_only_packages_from_selected_branch(Branch::P10, &selected_arch).await;
 
     for only_p10_package in _only_p10_packages {
-        println!("{}", only_p10_package.name_ref())
+        println!("{}", only_p10_package.name_as_str())
+    }
+
+    let packages_vr_more_in_sisyphus_than_p10 =
+        fetch_vr_more_in_sisyphus_than_p10(&selected_arch).await;
+
+    for package in packages_vr_more_in_sisyphus_than_p10 {
+        println!("{}", package.name_as_str())
     }
 
     Ok(())
