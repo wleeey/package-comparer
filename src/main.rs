@@ -13,16 +13,20 @@ async fn main() {
         .filter(None, LevelFilter::Info)
         .init();
 
+    log::info!("fetching supported architectures...");
     let architectures = architecture_support::fetch_supported_architectures().await;
 
     let selected_arch = cli::select_architecture(architectures);
 
+    log::info!("fetching those packages that are only in sisyphus but not in p10...");
     let only_sisyphus_packages =
         cases::fetch_only_packages_from_selected_branch(Branch::Sisyphus, &selected_arch).await;
 
+    log::info!("fetching those packages that are only in p10 but not in sisyphus...");
     let only_p10_packages =
         cases::fetch_only_packages_from_selected_branch(Branch::P10, &selected_arch).await;
 
+    log::info!("fetching those packages that have more version-release in sisyphus than in p10...");
     let packages_vr_more_in_sisyphus_than_p10 =
         cases::fetch_vr_more_in_sisyphus_than_p10(&selected_arch).await;
 
