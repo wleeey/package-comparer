@@ -1,34 +1,56 @@
 use crate::api_alt_json_templates::Package;
 use crate::architecture_support::Arch;
 use crate::branches::Branch;
+use crate::FetchError;
 use rpm::Nevra;
 use std::cmp::Ordering;
 use std::collections::HashSet;
 
-pub async fn fetch_only_packages_from_selected_branch(branch: Branch, arch: &Arch) -> Vec<Package> {
-    let sisyphus_packages =
-        crate::fetch_packages_from_branch_for_architecture(Branch::Sisyphus, arch).await;
+pub async fn fetch_only_packages_from_selected_branch(
+    branch: Branch,
+    arch: &Arch,
+) -> Result<Vec<Package>, FetchError> {
+    let primary_packages = crate::fetch_packages_from_branch_for_architecture(branch, arch).await?;
 
-    let p10_packages = crate::fetch_packages_from_branch_for_architecture(Branch::P10, arch).await;
-
-    match branch {
-        Branch::Sisyphus => only_a_packages(sisyphus_packages, p10_packages).await,
-        Branch::P10 => only_a_packages(p10_packages, sisyphus_packages).await,
+    match crate::fetch_packages_from_branch_for_architecture(get_alternate_branch(branch), arch)
+        .await
+    {
+        Ok(packages) => Ok(only_a_packages(primary_packages, packages)),
+        Err(err) => Ok(handle_fetch_error(err, primary_packages)),
     }
 }
 
-pub async fn fetch_vr_more_in_sisyphus_than_p10(arch: &Arch) -> Vec<Package> {
-    let sisyphus_packages =
-        crate::fetch_packages_from_branch_for_architecture(Branch::Sisyphus, arch).await;
+pub fn handle_fetch_error(fetch_error: FetchError, packages: Vec<Package>) -> Vec<Package> {
+    match fetch_error {
+        FetchError::ArchNotSupported { branch, arch } => {
+            log::info!("Architectures {arch} is not supported for {branch} branch");
+            packages
+        }
+        FetchError::Other(message) => {
+            panic!("{}", message)
+        }
+    }
+}
 
-    let p10_packages = crate::fetch_packages_from_branch_for_architecture(Branch::P10, arch).await;
+fn get_alternate_branch(branch: Branch) -> Branch {
+    match branch {
+        Branch::Sisyphus => Branch::P10,
+        Branch::P10 => Branch::Sisyphus,
+    }
+}
+pub async fn fetch_vr_more_in_sisyphus_than_p10(arch: &Arch) -> Result<Vec<Package>, FetchError> {
+    let sisyphus_packages =
+        crate::fetch_packages_from_branch_for_architecture(Branch::Sisyphus, arch).await?;
+
+    let p10_packages =
+        crate::fetch_packages_from_branch_for_architecture(Branch::P10, arch).await?;
 
     let p10_names: HashSet<_> = p10_packages
         .iter()
         .map(|pkg| pkg.name_as_str().to_string())
         .collect();
 
-    sisyphus_packages
+    Ok(sisyphus_packages
         .into_iter()
         .filter(|sisyphus_package| {
             p10_names.contains(&sisyphus_package.name_as_str().to_string())
@@ -54,10 +76,10 @@ pub async fn fetch_vr_more_in_sisyphus_than_p10(arch: &Arch) -> Vec<Package> {
                         ) == Ordering::Greater
                 })
         })
-        .collect::<Vec<Package>>()
+        .collect::<Vec<Package>>())
 }
 
-async fn only_a_packages(packages_a: Vec<Package>, packages_b: Vec<Package>) -> Vec<Package> {
+fn only_a_packages(packages_a: Vec<Package>, packages_b: Vec<Package>) -> Vec<Package> {
     let packages_b_names = packages_b
         .into_iter()
         .map(|package| package.name_as_str().to_string())
@@ -81,10 +103,14 @@ mod tests {
         let architecture = architectures.iter().next().unwrap();
 
         let test_packages =
-            fetch_only_packages_from_selected_branch(Branch::Sisyphus, architecture).await;
+            fetch_only_packages_from_selected_branch(Branch::Sisyphus, architecture)
+                .await
+                .unwrap();
 
         let packages =
-            crate::fetch_packages_from_branch_for_architecture(Branch::P10, architecture).await;
+            crate::fetch_packages_from_branch_for_architecture(Branch::P10, architecture)
+                .await
+                .unwrap();
 
         let package_names = packages
             .into_iter()

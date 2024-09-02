@@ -1,3 +1,4 @@
+#[derive(Clone, Copy)]
 pub enum Branch {
     Sisyphus,
     P10,

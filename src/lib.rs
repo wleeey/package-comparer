@@ -8,21 +8,33 @@ pub mod architecture_support;
 pub mod branches;
 pub mod cases;
 
-async fn fetch_packages_from_branch_for_architecture(branch: Branch, arch: &Arch) -> Vec<Package> {
+async fn fetch_packages_from_branch_for_architecture(
+    branch: Branch,
+    arch: &Arch,
+) -> Result<Vec<Package>, FetchError> {
     let client = Client::new();
 
     if !architecture_support::is_architecture_supported_for_brunch(arch, &branch).await {
-        return Vec::new();
+        return Err(FetchError::ArchNotSupported {
+            branch: branch.as_str().to_string(),
+            arch: arch.to_string(),
+        });
     }
 
-    client
+    Ok(client
         .get(format!("{}{}", API_URL, branch.as_str()))
         .query(&[("arch", arch.inner_ref())])
         .send()
         .await
-        .unwrap()
+        .map_err(|err| -> FetchError { FetchError::Other(err.to_string()) })?
         .json::<Packages>()
         .await
-        .unwrap_or_else(|err| panic!("Failed parse Packages: {err}"))
-        .packages
+        .map_err(|err| -> FetchError { FetchError::Other(err.to_string()) })?
+        .packages)
+}
+
+#[derive(Debug)]
+pub enum FetchError {
+    ArchNotSupported { branch: String, arch: String },
+    Other(String),
 }
