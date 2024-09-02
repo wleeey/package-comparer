@@ -47,29 +47,29 @@ pub async fn fetch_vr_more_in_sisyphus_than_p10(arch: &Arch) -> Result<Vec<Packa
 
     let p10_names: HashSet<_> = p10_packages
         .iter()
-        .map(|pkg| pkg.name_as_str().to_string())
+        .map(|pkg| pkg.name_ref().to_string())
         .collect();
 
     Ok(sisyphus_packages
         .into_iter()
         .filter(|sisyphus_package| {
-            p10_names.contains(&sisyphus_package.name_as_str().to_string())
+            p10_names.contains(&sisyphus_package.name_ref().to_string())
                 && p10_packages.iter().any(|p10_package| {
-                    p10_package.name_as_str() == sisyphus_package.name_as_str()
+                    p10_package.name_ref() == sisyphus_package.name_ref()
                         && rpm::rpm_evr_compare(
                             &Nevra::new(
                                 "",
                                 &sisyphus_package.epoch_ref().to_string().as_str(),
-                                &sisyphus_package.version_as_str(),
-                                &sisyphus_package.release_as_str(),
+                                &sisyphus_package.version_ref(),
+                                &sisyphus_package.release_ref(),
                                 "",
                             )
                             .to_string(),
                             &Nevra::new(
                                 "",
                                 &p10_package.epoch_ref().to_string().as_str(),
-                                &p10_package.version_as_str(),
-                                &p10_package.release_as_str(),
+                                &p10_package.version_ref(),
+                                &p10_package.release_ref(),
                                 "",
                             )
                             .to_string(),
@@ -82,12 +82,12 @@ pub async fn fetch_vr_more_in_sisyphus_than_p10(arch: &Arch) -> Result<Vec<Packa
 fn only_a_packages(packages_a: Vec<Package>, packages_b: Vec<Package>) -> Vec<Package> {
     let packages_b_names = packages_b
         .into_iter()
-        .map(|package| package.name_as_str().to_string())
+        .map(|package| package.name_ref().to_string())
         .collect::<HashSet<String>>();
 
     packages_a
         .into_iter()
-        .filter(|package| !packages_b_names.contains(package.name_as_str()))
+        .filter(|package| !packages_b_names.contains(package.name_ref()))
         .collect::<Vec<Package>>()
 }
 
@@ -114,14 +114,14 @@ mod tests {
 
         let package_names = packages
             .into_iter()
-            .map(|package| package.name_as_str().to_string())
+            .map(|package| package.name_ref().to_string())
             .collect::<HashSet<String>>();
 
         for test_package in test_packages {
-            if package_names.contains(&test_package.name_as_str().to_string()) {
+            if package_names.contains(&test_package.name_ref().to_string()) {
                 panic!(
                     "Package '{}' exists in both branches!",
-                    test_package.name_as_str()
+                    test_package.name_ref()
                 );
             }
         }

@@ -19,7 +19,7 @@ async fn main() {
 
     let selected_arch = cli::select_architecture(architectures);
 
-    log::info!("Fetching those packages that are only in p10 but not in sisyphus...");
+    log::info!("Fetching those packages that are only in sisyphus but not in p10...");
     let only_sisyphus_packages =
         cases::fetch_only_packages_from_selected_branch(Branch::Sisyphus, &selected_arch)
             .await

@@ -4,7 +4,7 @@ use reqwest::Client;
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 
-pub(crate) const API_URL: &str = "https://rdb.altlinux.org/api/export/branch_binary_packages/";
+pub(crate) const API_ALT_URL: &str = "https://rdb.altlinux.org/api/export/branch_binary_packages/";
 
 pub async fn fetch_supported_architectures() -> Vec<Arch> {
     let sisyphus_packages = fetch_packages(Branch::Sisyphus).await;
@@ -29,7 +29,7 @@ pub async fn fetch_supported_architectures() -> Vec<Arch> {
 pub(crate) async fn is_architecture_supported_for_brunch(arch: &Arch, branch: &Branch) -> bool {
     let client = Client::new();
     let res = client
-        .get(format!("{}{}", API_URL, branch.as_str()))
+        .get(format!("{}{}", API_ALT_URL, branch.as_str()))
         .query(&[("arch", arch.inner_ref())])
         .send()
         .await
@@ -39,7 +39,7 @@ pub(crate) async fn is_architecture_supported_for_brunch(arch: &Arch, branch: &B
 }
 
 async fn fetch_packages(branch: Branch) -> Vec<Package> {
-    reqwest::get(format!("{}{}", API_URL, branch.as_str()))
+    reqwest::get(format!("{}{}", API_ALT_URL, branch.as_str()))
         .await
         .unwrap()
         .json::<Packages>()
@@ -51,7 +51,7 @@ async fn fetch_packages(branch: Branch) -> Vec<Package> {
 fn extract_architectures_from_packages(packages: &Vec<Package>) -> Vec<&str> {
     packages
         .iter()
-        .map(|package| package.arch_as_str())
+        .map(|package| package.arch_ref())
         .collect::<HashSet<_>>()
         .into_iter()
         .collect()

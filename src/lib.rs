@@ -1,5 +1,5 @@
 use crate::api_alt_json_templates::{Package, Packages};
-use crate::architecture_support::{Arch, API_URL};
+use crate::architecture_support::{Arch, API_ALT_URL};
 use crate::branches::Branch;
 use reqwest::Client;
 
@@ -22,7 +22,7 @@ async fn fetch_packages_from_branch_for_architecture(
     }
 
     Ok(client
-        .get(format!("{}{}", API_URL, branch.as_str()))
+        .get(format!("{}{}", API_ALT_URL, branch.as_str()))
         .query(&[("arch", arch.inner_ref())])
         .send()
         .await
