@@ -15,7 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run tests
-        run: cargo test
+        run: |
+              cd compare-packages
+              cargo test
 
   fmt:
     runs-on: ubuntu-latest
