@@ -1,5 +1,13 @@
 # package-comparer
 
+This program compares the "alt" packages and outputs the result, which includes:
+
+* Packages that are in the sisyphus branch, but which are not in the p10 branch.
+
+* Packages that are in the p10 branch, but which are not in the sisyphus branch.
+
+* Packages whose versions are higher in sisyphus than in p10.
+
 ## installation
 
 ### 1. Install Rust
