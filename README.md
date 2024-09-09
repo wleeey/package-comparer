@@ -1,6 +1,6 @@
 # package-comparer
 
-This program compares the "alt" packages and outputs the result, which includes:
+This program compares the alt packages and outputs the result, which includes:
 
 * Packages that are in the sisyphus branch, but which are not in the p10 branch.
 
