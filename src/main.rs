@@ -1,8 +1,8 @@
+use compare_packages::api_alt_json_templates::Package;
+use compare_packages::branches::Branch;
+use compare_packages::{architecture_support, cases, FetchError};
 use env_logger::Builder;
 use log::LevelFilter;
-use package_comparer::api_alt_json_templates::Package;
-use package_comparer::branches::Branch;
-use package_comparer::{architecture_support, cases, FetchError};
 use std::io::Write;
 
 mod cli;
@@ -47,5 +47,5 @@ async fn main() {
 }
 
 fn fetch_error_for_output(fetch_fn: FetchError) -> Vec<Package> {
-    package_comparer::handle_fetch_error(fetch_fn, vec![])
+    compare_packages::handle_fetch_error(fetch_fn, vec![])
 }
