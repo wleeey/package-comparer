@@ -1,8 +1,8 @@
-use crate::cli::select_branches;
 use compare_packages::api_alt_json_templates::Package;
 use compare_packages::{architecture_support, cases, FetchError};
 use env_logger::Builder;
 use log::LevelFilter;
+use std::fs;
 use std::io::Write;
 
 mod cli;
@@ -14,7 +14,7 @@ async fn main() {
         .filter(None, LevelFilter::Info)
         .init();
 
-    let (branch_one, branch_two) = select_branches();
+    let (branch_one, branch_two) = cli::select_branches();
 
     log::info!("Fetching supported architectures...");
     let architectures =
@@ -41,12 +41,18 @@ async fn main() {
             .unwrap_or_else(fetch_error_for_output);
 
     let output = serde_json::json!({
-        "only_sisyphus_packages": only_sisyphus_packages,
-        "only_p10_packages": only_p10_packages,
-        "packages_vr_more_in_sisyphus_than_p10": packages_vr_more_in_sisyphus_than_p10
+        format!("only_{branch_one}_packages"): only_sisyphus_packages,
+        format!("only_{branch_two}_packages"): only_p10_packages,
+        format!("packages_vr_more_in_{branch_one}_than_{branch_two}"): packages_vr_more_in_sisyphus_than_p10
     });
 
-    println!("{}", output);
+    fs::write(
+        "output.json",
+        serde_json::to_string_pretty(&output).unwrap(),
+    )
+    .expect("Error writing file to output file");
+
+    log::info!("Result of the program was recorded in output.json")
 }
 
 fn fetch_error_for_output(fetch_fn: FetchError) -> Vec<Package> {
