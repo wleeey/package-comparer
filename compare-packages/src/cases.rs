@@ -1,5 +1,5 @@
-mod fetch_only_packages_from_selected_branch;
-mod fetch_vr_more_in_sisyphus_than_p10;
+mod fetch_only_packages_from_a_branch;
+mod fetch_vr_more_in_a_than_b_branch;
 
-pub use fetch_only_packages_from_selected_branch::fetch_only_packages_from_selected_branch;
-pub use fetch_vr_more_in_sisyphus_than_p10::fetch_vr_more_in_sisyphus_than_p10;
+pub use fetch_only_packages_from_a_branch::fetch_only_packages_from_a_branch;
+pub use fetch_vr_more_in_a_than_b_branch::fetch_vr_more_in_a_than_b_branch;

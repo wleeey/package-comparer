@@ -4,24 +4,17 @@ use crate::branches::Branch;
 use crate::FetchError;
 use std::collections::HashSet;
 
-pub async fn fetch_only_packages_from_selected_branch(
-    branch: Branch,
+pub async fn fetch_only_packages_from_a_branch(
+    branch_a: Branch,
+    branch_b: Branch,
     arch: &Arch,
 ) -> Result<Vec<Package>, FetchError> {
-    let primary_packages = crate::fetch_packages_from_branch_for_architecture(branch, arch).await?;
+    let primary_packages =
+        crate::fetch_packages_from_branch_for_architecture(branch_a, arch).await?;
 
-    match crate::fetch_packages_from_branch_for_architecture(get_alternate_branch(branch), arch)
-        .await
-    {
+    match crate::fetch_packages_from_branch_for_architecture(branch_b, arch).await {
         Ok(packages) => Ok(only_a_packages(primary_packages, packages)),
         Err(err) => Ok(crate::handle_fetch_error(err, primary_packages)),
-    }
-}
-
-fn get_alternate_branch(branch: Branch) -> Branch {
-    match branch {
-        Branch::Sisyphus => Branch::P10,
-        Branch::P10 => Branch::Sisyphus,
     }
 }
 
@@ -45,12 +38,14 @@ mod tests {
 
     #[tokio::test]
     pub async fn only_packages_unique_to_the_branch_are_output() {
-        let architectures = architecture_support::fetch_supported_architectures().await;
+        let architectures =
+            architecture_support::fetch_supported_architectures(Branch::Sisyphus, Branch::P10)
+                .await;
 
         let architecture = architectures.iter().next().unwrap();
 
         let test_packages =
-            fetch_only_packages_from_selected_branch(Branch::Sisyphus, architecture)
+            fetch_only_packages_from_a_branch(Branch::Sisyphus, Branch::P10, architecture)
                 .await
                 .unwrap();
 
