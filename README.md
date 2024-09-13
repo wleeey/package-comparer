@@ -2,11 +2,11 @@
 
 This program compares the alt packages and outputs the result, which includes:
 
-* Packages that are in the sisyphus branch, but which are not in the p10 branch.
+* Packages that are in the "A" branch, but which are not in the "B" branch.
 
-* Packages that are in the p10 branch, but which are not in the sisyphus branch.
+* Packages that are in the "B" branch, but which are not in the "A" branch.
 
-* Packages whose versions are higher in sisyphus than in p10.
+* Packages whose versions are higher in "A" than in "B".
 
 ## installation
 
