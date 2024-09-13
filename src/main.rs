@@ -2,8 +2,8 @@ use compare_packages::api_alt_json_templates::Package;
 use compare_packages::{architecture_support, cases, FetchError};
 use env_logger::Builder;
 use log::LevelFilter;
-use std::fs;
 use std::io::Write;
+use std::{fs, io};
 
 mod cli;
 
@@ -46,13 +46,21 @@ async fn main() {
         format!("packages_vr_more_in_{branch_one}_than_{branch_two}"): packages_vr_more_in_sisyphus_than_p10
     });
 
+    let mut file_name = String::new();
+    println!("Enter the name of the file in which the program result will be written:");
+    io::stdin()
+        .read_line(&mut file_name)
+        .expect("File name entered by the user could not be read");
+
+    let file_name = file_name.trim();
+
     fs::write(
-        "output.json",
+        format!("{file_name}.json"),
         serde_json::to_string_pretty(&output).unwrap(),
     )
     .expect("Error writing file to output file");
 
-    log::info!("Result of the program was recorded in output.json")
+    log::info!("Result of the program was recorded in {file_name}.json")
 }
 
 fn fetch_error_for_output(fetch_fn: FetchError) -> Vec<Package> {
